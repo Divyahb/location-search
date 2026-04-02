@@ -7,7 +7,7 @@ import locationRoutes from './routes/locations';
 import LocationRepository from './repositories/location.repository';
 import LocationService from './services/locations.service';
 import { StoredLocation } from './types';
-
+import registerLogging from './lib/logging';
 
 const buildServer = async () => {
     const server = fastify({ logger: true });
@@ -30,6 +30,8 @@ const buildServer = async () => {
     });
 
     await server.register(mongoPlugin);
+    registerLogging(server);
+
     const collection = server.mongo.db?.collection<StoredLocation>('locations');
 
     if (!collection) {

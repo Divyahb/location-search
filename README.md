@@ -30,6 +30,14 @@ Local development uses:
 
 - [config/.dev.env](/c:/Users/divya/development/bonial/config/.dev.env)
 
+Local MongoDB startup values:
+
+- URL: `mongodb://root:example@localhost:27017/bonial?authSource=admin`
+- Username: `root`
+- Password: `example`
+- Database: `bonial`
+- Collection: `locations`
+
 Production-style configuration can use:
 
 - [config/.prod.env](/c:/Users/divya/development/bonial/config/.prod.env)
@@ -78,6 +86,12 @@ These scripts are convenience wrappers for local development. They automate the 
 2. install dependencies
 3. seed the database
 4. start the application
+
+They assume the local Docker MongoDB instance uses:
+
+- Username: `root`
+- Password: `example`
+- URL: `mongodb://root:example@localhost:27017/bonial?authSource=admin`
 
 ### macOS / Linux
 
@@ -287,3 +301,13 @@ Pagination is used to avoid returning too many records at once.
 - it reduces the chance of one request pulling a very large dataset
 
 For the search endpoint, pagination is applied after sorting by distance so the nearest valid results are returned first.
+
+## Future Enhancements
+
+- Add caching for frequently repeated read/search queries.
+- Add API versioning
+- Add cursor-based pagination for large datasets where high skip values become expensive.
+- Structured global & clear API error handling for certain cases: For ex: Move duplicate-key database errors to clean 409 Conflict API responses.
+- Add input normalization and stricter validation for coordinates, radius, and location payloads.
+- Add unit tests for transformation helpers such as coordinate parsing and visibility-bound generation.
+- Improved logging library
