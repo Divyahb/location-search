@@ -28,11 +28,12 @@ const LocationSearchResponseSchema = Type.Object({
 
 
 const ErrorResponseSchema = Type.Object({
+    code: Type.Optional(Type.Union([Type.Number(), Type.String()])),
     error: Type.Optional(Type.String()),
     message: Type.Optional(Type.String()),
-    code: Type.Optional(Type.Number()),
     statusCode: Type.Optional(Type.Number()),
 });
+
 
 export {
     LocationSchema,

@@ -56,8 +56,61 @@ class LocationRepository {
     }
 
     async searchLocationsByCoordinates(x: number, y: number): Promise<LocationSearchResponse[]> {
-        return [];
+        return this.collection.aggregate<LocationSearchResponse>([
+            {
+                $match: {
+                    'visibilityBounds.minX': { $lte: x },
+                    'visibilityBounds.maxX': { $gte: x },
+                    'visibilityBounds.minY': { $lte: y },
+                    'visibilityBounds.maxY': { $gte: y },
+                }
+            },
+            {
+                $addFields: {
+                    distance: {
+                        $sqrt: {
+                            $add: [
+                                {
+                                    $pow: [
+                                        { $subtract: ['$cartesianCoordinates.x', x] },
+                                        2
+                                    ]
+                                },
+                                {
+                                    $pow: [
+                                        { $subtract: ['$cartesianCoordinates.y', y] },
+                                        2
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                $match: {
+                    $expr: {
+                        $lte: ['$distance', '$radius']
+                    }
+                }
+            },
+            {
+                $sort: {
+                    distance: 1
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    id: 1,
+                    name: 1,
+                    coordinates: 1,
+                    distance: 1
+                }
+            }
+        ]).toArray();
     }
+
 }
 
 export default LocationRepository;

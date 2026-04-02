@@ -15,11 +15,11 @@ const routes = async (server: FastifyInstance, deps: {
     locationService: LocationService
 }): Promise<void> => {
 
-    server.get<{ Querystring: { x: number, y: number } }>('/locations', {
+    server.get<{ Querystring: { x: number, y: number } }>('/locations/search', {
         schema: {
             tags: ['location'],
             description: 'Get visible locations by user co-ordinates',
-            params: Type.Object({
+            querystring: Type.Object({
                 x: Type.Number(),
                 y: Type.Number()
             }),
