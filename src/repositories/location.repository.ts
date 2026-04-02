@@ -1,4 +1,4 @@
-import { Collection, DeleteResult, ObjectId } from 'mongodb';
+import { Collection, ObjectId } from 'mongodb';
 import { Location, LocationPostRequest } from '../types';
 
 class LocationRepository {
@@ -35,8 +35,16 @@ class LocationRepository {
         return this.findById(id);
     }
 
-    async deleteOne(id: string): Promise<DeleteResult> {
-        return await this.collection.deleteOne({ id });
+    async deleteOne(id: string): Promise<Location | null> {
+        const existingLocation = await this.findById(id);
+
+        if (!existingLocation) {
+            return null;
+        }
+
+        await this.collection.deleteOne({ id });
+
+        return existingLocation;
     }
 }
 

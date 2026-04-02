@@ -81,7 +81,7 @@ const routes = async (server: FastifyInstance, deps: { locationRepository: Locat
 
         if (!location) {
             return reply.code(404).send({
-                code: 404,
+                statusCode: 404,
                 message: `Location ${id} not found`,
             });
         }

@@ -20,8 +20,9 @@ const LocationSchema = Type.Object({
 })
 
 const ErrorResponseSchema = Type.Object({
-    code: Type.Number(),
-    message: Type.String()
+    error: Type.Optional(Type.String()),
+    message: Type.String(),
+    statusCode: Type.Optional(Type.Number()),
 });
 
 export { LocationSchema, LocationPostSchema, ErrorResponseSchema }
