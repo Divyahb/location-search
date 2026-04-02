@@ -1,44 +1,11 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { FastifyInstance } from 'fastify';
-import { StoredLocation, CartesianCoordinates, VisibilityBounds, Location } from '../types';
+import { StoredLocation, Location } from '../types';
+import { buildLocationDocument } from '../lib/location-transform';
 
 const LOCATIONS_COLLECTION = 'locations';
 const DEFAULT_LOCATIONS_PATH = path.resolve(process.cwd(), 'data', 'locations.json');
-
-const parseCoordinates = (coordinateString: string): CartesianCoordinates => {
-    const match = coordinateString.match(/^x=(\d+),y=(\d+)$/);
-
-    if (!match) {
-        throw new Error(`Invalid coordinates format: ${coordinateString}`);
-    }
-
-    return {
-        x: Number(match[1]),
-        y: Number(match[2]),
-    };
-};
-
-const buildVisibilityBounds = (coordinates: CartesianCoordinates, radius: number): VisibilityBounds => {
-    return {
-        minX: coordinates.x - radius,
-        maxX: coordinates.x + radius,
-        minY: coordinates.y - radius,
-        maxY: coordinates.y + radius
-    }
-}
-
-const buildLocationDocument = (location: Location): StoredLocation => {
-
-    const cartesianCoordinates = parseCoordinates(location.coordinates);
-
-    return {
-        ...location,
-        cartesianCoordinates,
-        visibilityBounds: buildVisibilityBounds(cartesianCoordinates, location.radius)
-    }
-
-}
 
 const seedLocations = async (server: FastifyInstance): Promise<void> => {
     const collection = server.mongo.db?.collection<StoredLocation>(LOCATIONS_COLLECTION);
@@ -85,5 +52,4 @@ const seedLocations = async (server: FastifyInstance): Promise<void> => {
 
 export {
     seedLocations,
-    buildLocationDocument
 };

@@ -5,7 +5,6 @@ import mongoPlugin from './plugins/mongodb';
 import routes from './routes';
 import LocationRepository from './repositories/location.repository';
 import { StoredLocation } from './types';
-import { seedLocations } from './services/seed-locations.service';
 
 
 const buildServer = async () => {
@@ -29,7 +28,6 @@ const buildServer = async () => {
     });
 
     await server.register(mongoPlugin);
-    await seedLocations(server);
     const collection = server.mongo.db?.collection<StoredLocation>('locations');
 
     if (!collection) {

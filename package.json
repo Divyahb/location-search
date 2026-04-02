@@ -5,6 +5,7 @@
     "main": "dist/server.js",
     "scripts": {
         "build": "tsc",
+        "seed": "dotenv -e config/.dev.env -- ts-node src/scripts/seed-locations.ts",
         "start": "node dist/server.js",
         "dev": "dotenv -e config/.dev.env -- nodemon --watch src --ext ts --exec ts-node src/server.ts"
     },

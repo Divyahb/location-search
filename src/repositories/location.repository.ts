@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { Collection } from 'mongodb';
 import { Location, LocationPostRequest, StoredLocation } from '../types';
-import { buildLocationDocument } from '../services/seed-locations.service';
+import { buildLocationDocument } from '../lib/location-transform';
 
 
 class LocationRepository {
