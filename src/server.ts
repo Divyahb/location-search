@@ -4,7 +4,7 @@ import { fastifySwaggerUi } from '@fastify/swagger-ui';
 import mongoPlugin from './plugins/mongodb';
 import routes from './routes';
 import LocationRepository from './repositories/location.repository';
-import { Location } from './types';
+import { Location, TransformedLocation } from './types';
 import { seedLocations } from './services/seed-locations.service';
 
 
@@ -30,7 +30,7 @@ const buildServer = async () => {
 
     await server.register(mongoPlugin);
     await seedLocations(server);
-    const collection = server.mongo.db?.collection<Location>('locations');
+    const collection = server.mongo.db?.collection<TransformedLocation>('locations');
 
     if (!collection) {
         throw new Error('MongoDB collection is not available');

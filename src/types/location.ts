@@ -17,12 +17,22 @@ type LocationPostRequest = {
     'coordinates': string;
 }
 
+type CartesianCoordinates = {
+    x: number;
+    y: number;
+}
+
+type VisibilityBounds = {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+}
+
 
 type TransformedLocation = Location & {
-    transformedCoordinates: {
-        type: "Point",
-        values: [number, number]
-    };
+    cartesianCoordinates: CartesianCoordinates;
+    visibilityBounds: VisibilityBounds;
 }
 
 type LocationSearchResponse = {
@@ -32,4 +42,4 @@ type LocationSearchResponse = {
     distance: number
 }
 
-export { Location, TransformedLocation, LocationSearchResponse, LocationPostRequest }
+export { Location, TransformedLocation, LocationSearchResponse, LocationPostRequest, CartesianCoordinates, VisibilityBounds }

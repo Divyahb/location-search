@@ -1,28 +1,36 @@
-import { Collection, ObjectId } from 'mongodb';
-import { Location, LocationPostRequest } from '../types';
+import { randomUUID } from 'crypto';
+import { Collection } from 'mongodb';
+import { Location, LocationPostRequest, TransformedLocation } from '../types';
+import { buildLocationDocument } from '../services/seed-locations.service';
+
 
 class LocationRepository {
-    constructor(private readonly collection: Collection<Location>) {
+    constructor(private readonly collection: Collection<TransformedLocation>) {
 
     }
 
     async findById(id: string): Promise<Location | null> {
-        return this.collection.findOne({ id });
+        const transformedLocationDocument = await this.collection.findOne({ id });
+        if (!transformedLocationDocument) {
+            return null;
+        }
+        const { visibilityBounds, cartesianCoordinates, ...locationDocument } = transformedLocationDocument;
+        return locationDocument;
     }
 
     async createOne(location: LocationPostRequest): Promise<Location> {
         const document: Location = {
-            id: new ObjectId().toHexString(),
+            id: randomUUID(),
             ...location,
         };
 
-        await this.collection.insertOne(document);
+        await this.collection.insertOne(buildLocationDocument(document));
 
         return document;
     }
 
     async updateOne(location: Location): Promise<Location | null> {
-        const { id, ...updates } = location;
+        const { id, ...updates } = buildLocationDocument(location);
         const result = await this.collection.updateOne(
             { id },
             { $set: updates }
