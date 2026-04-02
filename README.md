@@ -50,6 +50,8 @@ Seed data lives in:
 
 - `data/locations.json`
 
+Replace contents from locations_big.json for testing large datasets
+
 The `locations` array from that file is read and upserted into the MongoDB `locations` collection.
 
 ## Development Setup

@@ -168,6 +168,7 @@ test('GET /locations/:id returns 404 when location is missing', async () => {
     assert.deepEqual(response.json(), {
         code: 404,
         message: 'Location missing-id not found',
+        statusCode: 404,
     });
 
     await app.close();
