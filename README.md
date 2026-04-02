@@ -16,11 +16,11 @@ TypeScript + Fastify service for managing restaurant locations stored in MongoDB
 
 ## Project Entry Points
 
-- Application startup: [src/server.ts](/c:/Users/divya/development/bonial/src/server.ts)
-- MongoDB plugin: [src/plugins/mongodb.ts](/c:/Users/divya/development/bonial/src/plugins/mongodb.ts)
-- Seed script entry: [src/scripts/seed-locations.ts](/c:/Users/divya/development/bonial/src/scripts/seed-locations.ts)
-- Seed implementation: [src/services/seed-locations.service.ts](/c:/Users/divya/development/bonial/src/services/seed-locations.service.ts)
-- Transformation helpers: [src/lib/location-transform.ts](/c:/Users/divya/development/bonial/src/lib/location-transform.ts)
+- Application startup: `src/server.ts`
+- MongoDB plugin: `src/plugins/mongodb.ts`
+- Seed script entry: `src/scripts/seed-locations.ts`
+- Seed implementation: `src/services/seed-locations.service.ts`
+- Transformation helpers: `src/lib/location-transform.ts`
 
 ## Environment
 
@@ -29,7 +29,7 @@ It can also read `PORT`, and defaults to `3000` when not provided.
 
 Local development uses:
 
-- [config/.dev.env](/c:/Users/divya/development/bonial/config/.dev.env)
+- `config/.dev.env`
 
 Local MongoDB startup values:
 
@@ -42,13 +42,13 @@ Local MongoDB startup values:
 
 Production-style configuration can use:
 
-- [config/.prod.env](/c:/Users/divya/development/bonial/config/.prod.env)
+- `config/.prod.env`
 
 ## Data Source For Seeding
 
 Seed data lives in:
 
-- [data/locations.json](/c:/Users/divya/development/bonial/data/locations.json)
+- `data/locations.json`
 
 The `locations` array from that file is read and upserted into the MongoDB `locations` collection.
 
@@ -95,23 +95,11 @@ They assume the local Docker MongoDB instance uses:
 - Password: `example`
 - URL: `mongodb://root:example@localhost:27017/bonial?authSource=admin`
 
-### macOS / Linux
-
-Script:
-
-- [startup.sh](/c:/Users/divya/development/bonial/startup.sh)
-
-Run:
-
-```bash
-./startup.sh
-```
-
 ### Windows PowerShell
 
 Script:
 
-- [startup.ps1](/c:/Users/divya/development/bonial/startup.ps1)
+- `startup.ps1`
 
 Run:
 
@@ -119,9 +107,45 @@ Run:
 .\startup.ps1
 ```
 
+
+### macOS / Linux [Not Added, since I worked in a windows machine]
+
+Script:
+
+- `startup.sh`
+
+Run:
+
+```bash
+./startup.sh
+```
+
+
 These are optional. If you prefer, you can still run the setup commands manually.
 
 ## Production-Style Setup
+
+This section is for running the compiled application.
+
+In an actual production environment, MongoDB is expected to already be available and `MONGO_URL` is usually injected by the platform.
+
+If you are only testing the production build locally, you can optionally start MongoDB and seed data first.
+
+Optional local-only preparation steps:
+
+Start MongoDB locally:
+
+```bash
+docker compose up -d mongodb
+```
+
+Seed local data for build testing:
+
+```bash
+npm run seed
+```
+
+Those two steps are mainly for development purposes when you want to run the built app on your machine with local data.
 
 Build the application:
 
@@ -129,7 +153,7 @@ Build the application:
 npm run build
 ```
 
-Seed the database with a production `MONGO_URL`:
+If you want to seed using the production-style env file explicitly, you can also run:
 
 ```bash
 dotenv -e config/.prod.env -- ts-node src/scripts/seed-locations.ts
@@ -141,7 +165,13 @@ Start the compiled server:
 npm start
 ```
 
-If your production environment injects `MONGO_URL` directly, you can skip `dotenv` and run the same commands with the environment variable provided by the platform.
+In this repo, `npm start` loads `config/.prod.env` so the compiled server has a local `MONGO_URL`.
+
+If your production environment injects `MONGO_URL` directly, run the compiled server with the platform-provided environment instead of relying on the local `.env` file:
+
+```bash
+node dist/server.js
+```
 
 ## Swagger
 
@@ -165,8 +195,6 @@ The location routes follow these endpoint shapes:
 - `PUT /locations/:id` for full update by id
 - `DELETE /locations/:id` for deletion by id
 
-This keeps the search endpoint explicit and avoids mixing a named route with the dynamic `:id` route.
-
 ## MongoDB Notes
 
 - The app connects through `@fastify/mongodb`
@@ -181,7 +209,7 @@ When `npm run seed` runs, the seed script:
 
 1. Starts a lightweight Fastify instance only to reuse the MongoDB plugin configuration
 2. Connects to MongoDB using `MONGO_URL`
-3. Reads [data/locations.json](/c:/Users/divya/development/bonial/data/locations.json)
+3. Reads `data/locations.json`
 4. Transforms each location into the stored MongoDB document shape
 5. Creates indexes
 6. Upserts all seed records into the `locations` collection
@@ -193,7 +221,7 @@ Each raw location is converted into a stored document with extra computed fields
 - `cartesianCoordinates`
 - `visibilityBounds`
 
-Those values are built in [src/lib/location-transform.ts](/c:/Users/divya/development/bonial/src/lib/location-transform.ts).
+Those values are built in `src/lib/location-transform.ts`.
 
 ## Why The Pre-Seed Transformation Exists
 
@@ -205,46 +233,6 @@ This helps because:
 - query-time work is reduced
 - precomputed bounds support more scalable filtering
 - the stored document is better suited for location visibility queries than the raw `"x=2,y=2"` string format
-
-## Current NPM Commands
-
-```bash
-npm run build
-npm run seed
-npm run dev
-npm start
-npm run test:e2e
-```
-
-## E2E Testing
-
-Run the end-to-end test suite with:
-
-```bash
-npm run test:e2e
-```
-
-The current e2e tests live in:
-
-- [src/e2e/locations.e2e.test.ts](/c:/Users/divya/development/bonial/src/e2e/locations.e2e.test.ts)
-
-## Why `node:test` And `node:assert`
-
-This project currently uses Node's built-in test runner and assertion library:
-
-- `node:test`
-- `node:assert`
-
-Reasoning:
-
-- no extra test dependency is required
-- setup is minimal for a small backend service
-- it works well for Fastify `inject()`-based e2e tests
-- it keeps the project lightweight while the test suite is still small
-
-`node:assert` is an older built-in Node module. `node:test` is newer than tools like Jest or Mocha, but it is an official Node test runner and is a valid choice for simple backend testing.
-
-Jest, Mocha, or Vitest could also be used later if the project needs richer mocking, snapshots, or a more familiar test ecosystem.
 
 ## Architectural Notes
 
@@ -317,6 +305,46 @@ Pagination is used to avoid returning too many records at once.
 
 For the search endpoint, pagination is applied after sorting by distance so the nearest valid results are returned first.
 
+## Current NPM Commands
+
+```bash
+npm run build
+npm run seed
+npm run dev
+npm start
+npm run test:e2e
+```
+
+## E2E Testing
+
+Run the end-to-end test suite with:
+
+```bash
+npm run test:e2e
+```
+
+The current e2e tests live in:
+
+- `src/e2e/locations.e2e.test.ts`
+
+## Why `node:test` And `node:assert`
+
+This project currently uses Node's built-in test runner and assertion library:
+
+- `node:test`
+- `node:assert`
+
+Reasoning:
+
+- no extra test dependency is required
+- setup is minimal for a small backend service
+- it works well for Fastify `inject()`-based e2e tests
+- it keeps the project lightweight while the test suite is still small
+
+`node:assert` is an older built-in Node module. `node:test` is newer than tools like Jest or Mocha, but it is an official Node test runner and is a valid choice for simple backend testing.
+
+Jest, Mocha, or Vitest could also be used later if the project needs richer mocking, snapshots, or a more familiar test ecosystem.
+
 ## Future Enhancements
 
 - Add caching for frequently repeated read/search queries.
@@ -326,3 +354,6 @@ For the search endpoint, pagination is applied after sorting by distance so the 
 - Add input normalization and stricter validation for coordinates, radius, and location payloads.
 - Add unit tests for transformation helpers such as coordinate parsing and visibility-bound generation.
 - Improved logging library
+- Update startup.sh script to work in mac
+
+
