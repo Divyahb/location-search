@@ -44,16 +44,6 @@ Production-style configuration can use:
 
 - `config/.prod.env`
 
-## Data Source For Seeding
-
-Seed data lives in:
-
-- `data/locations.json`
-
-Replace contents from locations_big.json for testing large datasets
-
-The `locations` array from that file is read and upserted into the MongoDB `locations` collection.
-
 ## Development Setup
 
 Install dependencies:
@@ -73,6 +63,16 @@ Run the seed script with local env values:
 ```bash
 npm run seed
 ```
+
+#### Data Source For Seeding
+
+Seed data lives in:
+
+- `data/locations.json`
+
+Replace contents from locations_big.json for testing large datasets and run `npm run seed` again
+
+The `locations` array from that file is read and upserted into the MongoDB `locations` collection.
 
 Start the API in development mode:
 
