@@ -14,23 +14,42 @@ const errorResponses = {
 const routes = async (server: FastifyInstance, deps: {
     locationService: LocationService
 }): Promise<void> => {
+    server.get<{ Querystring: { skip: number, limit: number } }>('/locations', {
+        schema: {
+            tags: ['location'],
+            description: 'Get locations with pagination',
+            querystring: Type.Object({
+                skip: Type.Optional(Type.Integer({ minimum: 0, default: 0 })),
+                limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 500, default: 50 }))
+            }),
+            response: {
+                200: Type.Array(LocationSchema),
+                ...errorResponses
+            }
+        }
+    }, async (request) => {
+        const { skip, limit } = request.query;
+        return await deps.locationService.getLocations(skip, limit);
+    })
 
-    server.get<{ Querystring: { x: number, y: number } }>('/locations/search', {
+    server.get<{ Querystring: { x: number, y: number, skip: number, limit: number } }>('/locations/search', {
         schema: {
             tags: ['location'],
             description: 'Get visible locations by user co-ordinates',
             querystring: Type.Object({
                 x: Type.Number(),
-                y: Type.Number()
+                y: Type.Number(),
+                skip: Type.Optional(Type.Integer({ minimum: 0, default: 0 })),
+                limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 500, default: 50 }))
             }),
             response: {
                 200: Type.Array(LocationSearchResponseSchema),
                 ...errorResponses
             }
         }
-    }, async (request, reply) => {
-        const { x, y } = request.query;
-        return await deps.locationService.searchLocationsByCoordinates(x, y);
+    }, async (request) => {
+        const { x, y, skip, limit } = request.query;
+        return await deps.locationService.searchLocationsByCoordinates(x, y, skip, limit);
     })
 
     server.get<{ Params: { id: string } }>('/locations/:id', {

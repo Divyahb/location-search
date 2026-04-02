@@ -9,6 +9,24 @@ class LocationRepository {
 
     }
 
+    async getLocations(skip: number, limit: number): Promise<Location[]> {
+        const locations = await this.collection.find(
+            {},
+            {
+                projection: {
+                    _id: 0,
+                    cartesianCoordinates: 0,
+                    visibilityBounds: 0,
+                }
+            }
+        )
+            .skip(skip)
+            .limit(limit)
+            .toArray();
+
+        return locations;
+    }
+
     async findById(id: string): Promise<Location | null> {
         const transformedLocationDocument = await this.collection.findOne({ id });
         if (!transformedLocationDocument) {
@@ -55,7 +73,7 @@ class LocationRepository {
         return existingLocation;
     }
 
-    async searchLocationsByCoordinates(x: number, y: number): Promise<LocationSearchResponse[]> {
+    async searchLocationsByCoordinates(x: number, y: number, skip: number, limit: number): Promise<LocationSearchResponse[]> {
         return this.collection.aggregate<LocationSearchResponse>([
             {
                 $match: {
@@ -98,6 +116,12 @@ class LocationRepository {
                 $sort: {
                     distance: 1
                 }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
             },
             {
                 $project: {
