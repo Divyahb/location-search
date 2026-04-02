@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Collection } from 'mongodb';
-import { Location, LocationPostRequest, StoredLocation } from '../types';
+import { Location, LocationPostRequest, LocationSearchResponse, StoredLocation } from '../types';
 import { buildLocationDocument } from '../lib/location-transform';
 
 
@@ -53,6 +53,10 @@ class LocationRepository {
         await this.collection.deleteOne({ id });
 
         return existingLocation;
+    }
+
+    async searchLocationsByCoordinates(x: number, y: number): Promise<LocationSearchResponse[]> {
+        return [];
     }
 }
 

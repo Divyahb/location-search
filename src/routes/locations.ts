@@ -1,8 +1,8 @@
 import { Type } from '@sinclair/typebox';
 import { FastifyInstance } from 'fastify';
-import { HealthResponse, LocationPostRequest, Location } from './types';
-import { LocationSchema, ErrorResponseSchema, LocationPostSchema, } from './schemas';
-import LocationRepository from './repositories/location.repository';
+import { LocationPostRequest, Location } from '../types';
+import { LocationSchema, ErrorResponseSchema, LocationPostSchema, LocationSearchResponseSchema } from '../schemas';
+import LocationService from '../services/locations.service';
 
 const errorResponses = {
     400: ErrorResponseSchema,
@@ -11,22 +11,31 @@ const errorResponses = {
     500: ErrorResponseSchema,
 };
 
-const routes = async (server: FastifyInstance, deps: { locationRepository: LocationRepository }): Promise<void> => {
-    server.get<{ Reply: HealthResponse }>('/health', {
+const routes = async (server: FastifyInstance, deps: {
+    locationService: LocationService
+}): Promise<void> => {
+
+    server.get<{ Querystring: { x: number, y: number } }>('/locations', {
         schema: {
-            description: 'Get health of the application',
+            tags: ['location'],
+            description: 'Get visible locations by user co-ordinates',
+            params: Type.Object({
+                x: Type.Number(),
+                y: Type.Number()
+            }),
             response: {
-                200: Type.Object({
-                    status: Type.String()
-                })
+                200: Type.Array(LocationSearchResponseSchema),
+                ...errorResponses
             }
         }
-    }, () => {
-        return ({ status: 'ok' })
+    }, async (request, reply) => {
+        const { x, y } = request.query;
+        return await deps.locationService.searchLocationsByCoordinates(x, y);
     })
 
     server.get<{ Params: { id: string } }>('/locations/:id', {
         schema: {
+            tags: ['location'],
             description: 'Get location by id',
             params: Type.Object({
                 id: Type.String()
@@ -38,7 +47,7 @@ const routes = async (server: FastifyInstance, deps: { locationRepository: Locat
         }
     }, async (request, reply) => {
         const id = request.params.id;
-        const location = await deps.locationRepository.findById(id);
+        const location = await deps.locationService.findById(id);
 
         if (!location) {
             return reply.code(404).send({
@@ -52,7 +61,8 @@ const routes = async (server: FastifyInstance, deps: { locationRepository: Locat
 
     server.put<{ Body: Location }>('/locations', {
         schema: {
-            description: 'Get location by id',
+            tags: ['location'],
+            description: 'Update location by id',
             body: LocationSchema,
             response: {
                 200: LocationSchema,
@@ -60,13 +70,14 @@ const routes = async (server: FastifyInstance, deps: { locationRepository: Locat
             }
         }
     }, async (request, reply) => {
-        const location = await deps.locationRepository.updateOne(request.body);
+        const location = await deps.locationService.updateLocation(request.body);
         return location;
     })
 
     server.delete<{ Params: { id: string } }>('/locations/:id', {
         schema: {
-            description: 'Get location by id',
+            tags: ['location'],
+            description: 'Delete location by id',
             params: Type.Object({
                 id: Type.String()
             }),
@@ -77,7 +88,7 @@ const routes = async (server: FastifyInstance, deps: { locationRepository: Locat
         }
     }, async (request, reply) => {
         const id = request.params.id;
-        const location = await deps.locationRepository.deleteOne(id);
+        const location = await deps.locationService.deleteLocation(id);
 
         if (!location) {
             return reply.code(404).send({
@@ -91,6 +102,7 @@ const routes = async (server: FastifyInstance, deps: { locationRepository: Locat
 
     server.post<{ Body: LocationPostRequest }>('/locations', {
         schema: {
+            tags: ['location'],
             description: 'Create a new location. Id auto-generated',
             body: LocationPostSchema,
             response: {
@@ -99,9 +111,10 @@ const routes = async (server: FastifyInstance, deps: { locationRepository: Locat
             }
         }
     }, async (request) => {
-        const location = await deps.locationRepository.createOne(request.body);
+        const location = await deps.locationService.createLocation(request.body);
         return location;
     })
+
 }
 
 export default routes;

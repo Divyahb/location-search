@@ -2,8 +2,10 @@ import fastify from 'fastify';
 import { fastifySwagger } from '@fastify/swagger';
 import { fastifySwaggerUi } from '@fastify/swagger-ui';
 import mongoPlugin from './plugins/mongodb';
-import routes from './routes';
+import defaultRoutes from './routes';
+import locationRoutes from './routes/locations';
 import LocationRepository from './repositories/location.repository';
+import LocationService from './services/locations.service';
 import { StoredLocation } from './types';
 
 
@@ -12,14 +14,14 @@ const buildServer = async () => {
     await server.register(fastifySwagger, {
         swagger: {
             info: {
-                title: 'bonial',
-                description: 'Locations',
+                title: 'locations',
                 version: '1.0'
             },
-            host: 'localhost:3000',
-            schemes: ['http'],
             consumes: ['application/json'],
-            produces: ['application/json']
+            produces: ['application/json'],
+            tags: [{ name: 'health', description: 'Default application routes' },
+            { name: 'location', description: 'Location routes' }
+            ]
         },
     })
 
@@ -34,8 +36,13 @@ const buildServer = async () => {
         throw new Error('MongoDB collection is not available');
     }
 
-    await server.register(routes, {
-        locationRepository: new LocationRepository(collection)
+    const locationRepository = new LocationRepository(collection);
+    const locationService = new LocationService(locationRepository);
+
+    await server.register(defaultRoutes);
+
+    await server.register(locationRoutes, {
+        locationService
     });
 
     return server;
