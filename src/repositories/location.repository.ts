@@ -1,11 +1,11 @@
 import { randomUUID } from 'crypto';
 import { Collection } from 'mongodb';
-import { Location, LocationPostRequest, TransformedLocation } from '../types';
+import { Location, LocationPostRequest, StoredLocation } from '../types';
 import { buildLocationDocument } from '../services/seed-locations.service';
 
 
 class LocationRepository {
-    constructor(private readonly collection: Collection<TransformedLocation>) {
+    constructor(private readonly collection: Collection<StoredLocation>) {
 
     }
 

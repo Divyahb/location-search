@@ -1,45 +1,35 @@
-type Location = {
-    'name': string;
-    'type': string;
-    'id': string;
+export type Location = {
+    id: string;
+    name: string;
+    type: string;
     'opening-hours': string;
-    'image': string;
-    'radius': number;
-    'coordinates': string;
-}
+    image: string;
+    radius: number;
+    coordinates: string;
+};
 
-type LocationPostRequest = {
-    'name': string;
-    'type': string;
-    'opening-hours': string;
-    'image': string;
-    'radius': number;
-    'coordinates': string;
-}
+export type LocationPostRequest = Omit<Location, 'id'>;
 
-type CartesianCoordinates = {
+export type CartesianCoordinates = {
     x: number;
     y: number;
-}
+};
 
-type VisibilityBounds = {
+export type VisibilityBounds = {
     minX: number;
     maxX: number;
     minY: number;
     maxY: number;
-}
+};
 
-
-type TransformedLocation = Location & {
+export type StoredLocation = Location & {
     cartesianCoordinates: CartesianCoordinates;
     visibilityBounds: VisibilityBounds;
-}
+};
 
-type LocationSearchResponse = {
+export type LocationSearchResponse = {
     id: string;
     name: string;
     coordinates: string;
-    distance: number
-}
-
-export { Location, TransformedLocation, LocationSearchResponse, LocationPostRequest, CartesianCoordinates, VisibilityBounds }
+    distance: number;
+};

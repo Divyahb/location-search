@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { FastifyInstance } from 'fastify';
-import { TransformedLocation, CartesianCoordinates, VisibilityBounds, Location } from '../types';
+import { StoredLocation, CartesianCoordinates, VisibilityBounds, Location } from '../types';
 
 const LOCATIONS_COLLECTION = 'locations';
 const DEFAULT_LOCATIONS_PATH = path.resolve(process.cwd(), 'data', 'locations.json');
@@ -28,7 +28,7 @@ const buildVisibilityBounds = (coordinates: CartesianCoordinates, radius: number
     }
 }
 
-const buildLocationDocument = (location: Location): TransformedLocation => {
+const buildLocationDocument = (location: Location): StoredLocation => {
 
     const cartesianCoordinates = parseCoordinates(location.coordinates);
 
@@ -41,7 +41,7 @@ const buildLocationDocument = (location: Location): TransformedLocation => {
 }
 
 const seedLocations = async (server: FastifyInstance): Promise<void> => {
-    const collection = server.mongo.db?.collection<TransformedLocation>(LOCATIONS_COLLECTION);
+    const collection = server.mongo.db?.collection<StoredLocation>(LOCATIONS_COLLECTION);
 
     if (!collection) {
         throw new Error('MongoDB collection is not available');
@@ -65,7 +65,7 @@ const seedLocations = async (server: FastifyInstance): Promise<void> => {
 
     await collection.bulkWrite(
         locations.map((location) => {
-            const transformedLocation: TransformedLocation = buildLocationDocument(location);
+            const transformedLocation: StoredLocation = buildLocationDocument(location);
             return {
                 updateOne: {
                     filter: { id: location.id },
