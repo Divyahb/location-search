@@ -25,6 +25,7 @@ TypeScript + Fastify service for managing restaurant locations stored in MongoDB
 ## Environment
 
 The application expects `MONGO_URL` to be set.
+It can also read `PORT`, and defaults to `3000` when not provided.
 
 Local development uses:
 
@@ -37,6 +38,7 @@ Local MongoDB startup values:
 - Password: `example`
 - Database: `bonial`
 - Collection: `locations`
+- Application Port: `3000`
 
 Production-style configuration can use:
 
@@ -145,12 +147,25 @@ If your production environment injects `MONGO_URL` directly, you can skip `doten
 
 After the app starts, Swagger UI is available at:
 
-- `http://localhost:3000/docs`
+- [http://localhost:3000/docs](http://localhost:3000/docs)
 
 The API is grouped with these Swagger tags:
 
 - `health`
 - `location`
+
+## Route Design
+
+The location routes follow these endpoint shapes:
+
+- `GET /locations` for paginated listing
+- `GET /locations/search` for visibility search by user coordinates
+- `GET /locations/:id` for lookup by id
+- `POST /locations` for creation
+- `PUT /locations/:id` for full update by id
+- `DELETE /locations/:id` for deletion by id
+
+This keeps the search endpoint explicit and avoids mixing a named route with the dynamic `:id` route.
 
 ## MongoDB Notes
 

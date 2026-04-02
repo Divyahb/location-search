@@ -11,6 +11,12 @@ const errorResponses = {
     500: ErrorResponseSchema,
 };
 
+const buildErrorResponse = (statusCode: number, message: string) => ({
+    code: statusCode,
+    message,
+    statusCode,
+});
+
 const routes = async (server: FastifyInstance, deps: {
     locationService: LocationService
 }): Promise<void> => {
@@ -69,27 +75,35 @@ const routes = async (server: FastifyInstance, deps: {
         const location = await deps.locationService.findById(id);
 
         if (!location) {
-            return reply.code(404).send({
-                code: 404,
-                message: `Location ${id} not found`,
-            });
+            return reply.code(404).send(buildErrorResponse(404, `Location ${id} not found`));
         }
 
         return location;
     })
 
-    server.put<{ Body: Location }>('/locations', {
+    server.put<{ Params: { id: string }, Body: LocationPostRequest }>('/locations/:id', {
         schema: {
             tags: ['location'],
             description: 'Update location by id',
-            body: LocationSchema,
+            params: Type.Object({
+                id: Type.String()
+            }),
+            body: LocationPostSchema,
             response: {
                 200: LocationSchema,
                 ...errorResponses
             }
         }
     }, async (request, reply) => {
-        const location = await deps.locationService.updateLocation(request.body);
+        const location = await deps.locationService.updateLocation({
+            id: request.params.id,
+            ...request.body,
+        });
+
+        if (!location) {
+            return reply.code(404).send(buildErrorResponse(404, `Location ${request.params.id} not found`));
+        }
+
         return location;
     })
 
@@ -110,10 +124,7 @@ const routes = async (server: FastifyInstance, deps: {
         const location = await deps.locationService.deleteLocation(id);
 
         if (!location) {
-            return reply.code(404).send({
-                statusCode: 404,
-                message: `Location ${id} not found`,
-            });
+            return reply.code(404).send(buildErrorResponse(404, `Location ${id} not found`));
         }
 
         return location;
