@@ -7,7 +7,8 @@
         "build": "tsc",
         "seed": "dotenv -e config/.dev.env -- ts-node src/scripts/seed-locations.ts",
         "start": "node dist/server.js",
-        "dev": "dotenv -e config/.dev.env -- nodemon --watch src --ext ts --exec ts-node src/server.ts"
+        "dev": "dotenv -e config/.dev.env -- nodemon --watch src --ext ts --exec ts-node src/server.ts",
+        "test:e2e": "npm run build && node dist/e2e/locations.e2e.test.js"
     },
     "dependencies": {
         "@fastify/mongodb": "^9.0.2",

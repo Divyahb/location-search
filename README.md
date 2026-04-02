@@ -1,4 +1,4 @@
-# Fastify Locations Service
+# Locations Service
 
 TypeScript + Fastify service for managing restaurant locations stored in MongoDB.
 
@@ -147,4 +147,35 @@ npm run build
 npm run seed
 npm run dev
 npm start
+npm run test:e2e
 ```
+
+## E2E Testing
+
+Run the end-to-end test suite with:
+
+```bash
+npm run test:e2e
+```
+
+The current e2e tests live in:
+
+- [src/e2e/locations.e2e.test.ts](/c:/Users/divya/development/bonial/src/e2e/locations.e2e.test.ts)
+
+## Why `node:test` And `node:assert`
+
+This project currently uses Node's built-in test runner and assertion library:
+
+- `node:test`
+- `node:assert`
+
+Reasoning:
+
+- no extra test dependency is required
+- setup is minimal for a small backend service
+- it works well for Fastify `inject()`-based e2e tests
+- it keeps the project lightweight while the test suite is still small
+
+`node:assert` is an older built-in Node module. `node:test` is newer than tools like Jest or Mocha, but it is an official Node test runner and is a valid choice for simple backend testing.
+
+Jest, Mocha, or Vitest could also be used later if the project needs richer mocking, snapshots, or a more familiar test ecosystem.
