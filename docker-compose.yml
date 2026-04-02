@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:7.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: bonial
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+
+  app:
+    build: .
+    depends_on:
+      - mongodb
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URL: mongodb://root:example@mongodb:27017/bonial?authSource=admin
+    volumes:
+      - .:/usr/src/app
+    command: npm run dev
+
+volumes:
+  mongo_data:
