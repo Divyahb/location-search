@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { FastifyInstance } from 'fastify';
-import { StoredLocation, Location } from '../types';
+import { StoredLocation } from '../types';
 import { buildLocationDocument } from '../lib/location-transform';
 
 const LOCATIONS_COLLECTION = 'locations';
