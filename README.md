@@ -219,6 +219,8 @@ Jest, Mocha, or Vitest could also be used later if the project needs richer mock
 
 ## Architectural Notes
 
+#### Tested using both locations.json and locations_big.json
+
 ### Why MongoDB
 
 MongoDB is a good fit here because:
